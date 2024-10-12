@@ -1,16 +1,20 @@
 import { useState } from "react";
 import * as st from "./emoji-style";
+import Message from "./UI/message/message";
 
 function EmojiGenerator() {
   const [length, setLength] = useState("");
-  const [result, setResult] = useState("");
 
-  const handleLengthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLengthChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setLength(e.target.value);
   };
 
-  const handleGenerateClick = () => {
-    setResultet(generateEmoji(length));
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      return;
+    }
   };
 
   const emojisAfterWords = (text: string, array: string[]) => {
@@ -28,76 +32,30 @@ function EmojiGenerator() {
   };
 
   const generateEmoji = (text: string) => {
-    const emojis = [
-      "😀",
-      "😂",
-      "😍",
-      "😎",
-      "🤔",
-      "😇",
-      "😜",
-      "😱",
-      "😴",
-      "😈",
-      "👻",
-      "👽",
-      "🤖",
-      "💩",
-      "👾",
-      "🎃",
-      "😺",
-      "😸",
-      "😹",
-      "😻",
-      "😼",
-      "😽",
-      "🙀",
-      "😿",
-      "😾",
-      "🙈",
-      "🙉",
-      "🙊",
-      "🐵",
-      "🐶",
-      "🐺",
-      "🐱",
-      "🦁",
-      "🐯",
-      "🐴",
-      "🦄",
-      "🐮",
-      "🐷",
-      "🐽",
-      "🐸",
-      "🐙",
-      "🐵",
-      "🐔",
-      "🐧",
-      "🐦",
-      "🐤",
-      "🐣",
-      "🐥",
-      "🐺",
-      "🐗",
-    ];
-    return emojisAfterWords(text, emojis);
+    const emojis = {
+      baseEmoji: ["😀", "😂", "😍", "😎", "🤔", "😇", "😜", "😱", "😴", "😋", "😡", "😏", "😢", "😭", "😠", "😳", "👀"],
+    };
+    const allEmoji = Object.values(emojis).flat();
+    return emojisAfterWords(text, allEmoji);
   };
+
+  const result = generateEmoji(length);
 
   return (
     <st.Section>
       <st.Wrapper>
-        <st.TitleWrapper>
-          <st.Title>Эмодзи</st.Title>
-          <st.Flex>
-            <st.EmojiBlock>
-              <label>
-                <st.Span>Ваш текст:</st.Span>
-                <st.Input type="string" value={length} onChange={handleLengthChange} />
-              </label>
-              <st.Span>Результат: {generateEmoji(length)}</st.Span>
-            </st.EmojiBlock>
-          </st.Flex>
-        </st.TitleWrapper>
+        <st.DivCenter>
+          <st.Title>Эмодзи после слов</st.Title>
+          <st.BlockInput>
+            <st.InputTextarea value={length} onChange={handleLengthChange} placeholder="Ваш текст" />
+            <st.Label>
+              <st.TextEmoji onClick={() => copyToClipboard(result)}>
+                {result || <span className="placeholder">Нажми, чтобы скопировать результат</span>}
+              </st.TextEmoji>
+              <Message></Message>
+            </st.Label>
+          </st.BlockInput>
+        </st.DivCenter>
       </st.Wrapper>
     </st.Section>
   );
